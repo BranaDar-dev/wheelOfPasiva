@@ -1,0 +1,78 @@
+### Gradle ###
+.gradle
+**/build/
+!src/**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+### Kotlin ###
+.kotlin
+*.iml
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.ipr
+out/
+local.properties
+
+### Android ###
+captures/
+.externalNativeBuild
+.cxx
+lint/intermediates/
+lint/generated/
+lint/outputs/
+lint/tmp/
+lint-baseline.xml
+
+### iOS/Xcode ###
+xcuserdata/
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/project.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
+**/xcshareddata/WorkspaceSettings.xcsettings
+DerivedData/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+### CocoaPods (removed but keep for safety) ###
+Pods/
+Podfile.lock
+*.xcworkspace
+
+### Swift Package Manager ###
+.swiftpm/
+.build/
+
+### macOS ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### Backup files ###
+*.backup
+*.bak
+*~
+
+### Firebase ###
+# Keep these files OUT of version control - they contain sensitive keys
+# Add them manually after cloning
+**/google-services.json
+**/GoogleService-Info.plist
+
+### Node ###
+node_modules/
+
+### Logs ###
+*.log
+
+### Temporary files ###
+*.tmp
+*.temp
