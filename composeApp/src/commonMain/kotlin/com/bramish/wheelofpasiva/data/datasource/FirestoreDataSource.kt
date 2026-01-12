@@ -98,4 +98,89 @@ class FirestoreDataSource {
             Result.failure(RoomError.NetworkError(e))
         }
     }
+
+    /**
+     * Updates the game state with all wheel game fields.
+     */
+    suspend fun updateGameState(
+        roomId: String,
+        isSpinning: Boolean? = null,
+        nextTurnIndex: Int? = null,
+        playerScores: Map<String, Int>? = null,
+        revealedLetters: String? = null,
+        lastSliceIndex: Int? = null,
+        hasExtraTurn: Boolean? = null,
+        isGameOver: Boolean? = null,
+        winnerId: String? = null
+    ): Result<Unit> {
+        return try {
+            val documentRef = roomsCollection.document(roomId)
+            val snapshot = documentRef.get()
+
+            if (!snapshot.exists) {
+                return Result.failure(RoomError.RoomNotFound(roomId))
+            }
+
+            val roomData = snapshot.data<RoomDto>()
+            val updatedRoom = roomData.copy(
+                isSpinning = isSpinning ?: roomData.isSpinning,
+                currentTurnIndex = nextTurnIndex ?: roomData.currentTurnIndex,
+                playerScores = playerScores ?: roomData.playerScores,
+                revealedLetters = revealedLetters ?: roomData.revealedLetters,
+                lastSliceIndex = lastSliceIndex ?: roomData.lastSliceIndex,
+                hasExtraTurn = hasExtraTurn ?: roomData.hasExtraTurn,
+                isGameOver = isGameOver ?: roomData.isGameOver,
+                winnerId = winnerId ?: roomData.winnerId
+            )
+
+            documentRef.set(updatedRoom)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(RoomError.NetworkError(e))
+        }
+    }
+
+    /**
+     * Starts the game in a room.
+     */
+    suspend fun startGame(roomId: String): Result<Unit> {
+        return try {
+            val documentRef = roomsCollection.document(roomId)
+            val snapshot = documentRef.get()
+
+            if (!snapshot.exists) {
+                return Result.failure(RoomError.RoomNotFound(roomId))
+            }
+
+            val roomData = snapshot.data<RoomDto>()
+            val updatedRoom = roomData.copy(isGameStarted = true)
+
+            documentRef.set(updatedRoom)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(RoomError.NetworkError(e))
+        }
+    }
+
+    /**
+     * Sets the secret word/phrase for the game.
+     */
+    suspend fun setSecretWord(roomId: String, secretWord: String): Result<Unit> {
+        return try {
+            val documentRef = roomsCollection.document(roomId)
+            val snapshot = documentRef.get()
+
+            if (!snapshot.exists) {
+                return Result.failure(RoomError.RoomNotFound(roomId))
+            }
+
+            val roomData = snapshot.data<RoomDto>()
+            val updatedRoom = roomData.copy(secretWord = secretWord)
+
+            documentRef.set(updatedRoom)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(RoomError.NetworkError(e))
+        }
+    }
 }

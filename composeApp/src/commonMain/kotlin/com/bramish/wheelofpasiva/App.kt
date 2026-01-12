@@ -8,6 +8,7 @@ import com.bramish.wheelofpasiva.presentation.home.HomeScreen
 import com.bramish.wheelofpasiva.presentation.navigation.Screen
 import com.bramish.wheelofpasiva.presentation.navigation.rememberSimpleNavigator
 import com.bramish.wheelofpasiva.presentation.room.RoomScreen
+import com.bramish.wheelofpasiva.presentation.theme.WheelOfPasivaTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -24,31 +25,31 @@ fun App() {
     // Create the simple navigator (replaces NavController)
     val navigator = rememberSimpleNavigator()
 
-    MaterialTheme {
+    WheelOfPasivaTheme {
         when (val screen = navigator.currentScreen) {
             is Screen.Home -> {
                 HomeScreen(
                     viewModel = appContainer.provideHomeViewModel(),
                     joinRoomViewModel = appContainer.provideJoinRoomViewModel(),
-                    onNavigateToRoom = { roomId ->
-                        navigator.navigateToRoom(roomId)
+                    onNavigateToRoom = { roomId, playerId ->
+                        navigator.navigateToRoom(roomId, playerId)
                     }
                 )
             }
             is Screen.Room -> {
                 RoomScreen(
-                    viewModel = appContainer.provideRoomViewModel(screen.roomId),
+                    viewModel = appContainer.provideRoomViewModel(screen.roomId, screen.playerId),
                     onNavigateBack = {
                         navigator.navigateBack()
                     },
-                    onStartGame = {
-                        navigator.navigateToGame(screen.roomId)
+                    onNavigateToGame = {
+                        navigator.navigateToGame(screen.roomId, screen.playerId)
                     }
                 )
             }
             is Screen.Game -> {
                 GameScreen(
-                    viewModel = appContainer.provideGameViewModel(screen.roomId),
+                    viewModel = appContainer.provideGameViewModel(screen.roomId, screen.playerId),
                     onNavigateBack = {
                         navigator.navigateBack()
                     }

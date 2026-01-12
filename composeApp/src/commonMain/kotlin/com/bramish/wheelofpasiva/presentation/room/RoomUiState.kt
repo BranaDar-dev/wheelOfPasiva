@@ -17,10 +17,12 @@ sealed class RoomUiState {
      *
      * @property room The room data
      * @property players List of players in the room
+     * @property isCurrentPlayerHost Whether the current player is the host
      */
     data class Success(
         val room: Room,
-        val players: List<Player>
+        val players: List<Player>,
+        val isCurrentPlayerHost: Boolean
     ) : RoomUiState()
 
     /**

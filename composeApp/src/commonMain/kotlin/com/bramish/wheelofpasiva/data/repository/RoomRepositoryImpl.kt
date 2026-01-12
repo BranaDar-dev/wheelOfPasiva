@@ -44,4 +44,36 @@ class RoomRepositoryImpl(
             roomDto.toDomain()
         }
     }
+
+    override suspend fun updateGameState(
+        roomId: String,
+        isSpinning: Boolean?,
+        nextTurnIndex: Int?,
+        playerScores: Map<String, Int>?,
+        revealedLetters: String?,
+        lastSliceIndex: Int?,
+        hasExtraTurn: Boolean?,
+        isGameOver: Boolean?,
+        winnerId: String?
+    ): Result<Unit> {
+        return dataSource.updateGameState(
+            roomId = roomId,
+            isSpinning = isSpinning,
+            nextTurnIndex = nextTurnIndex,
+            playerScores = playerScores,
+            revealedLetters = revealedLetters,
+            lastSliceIndex = lastSliceIndex,
+            hasExtraTurn = hasExtraTurn,
+            isGameOver = isGameOver,
+            winnerId = winnerId
+        )
+    }
+
+    override suspend fun startGame(roomId: String): Result<Unit> {
+        return dataSource.startGame(roomId)
+    }
+
+    override suspend fun setSecretWord(roomId: String, secretWord: String): Result<Unit> {
+        return dataSource.setSecretWord(roomId, secretWord)
+    }
 }

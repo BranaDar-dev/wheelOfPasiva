@@ -8,6 +8,14 @@ import com.bramish.wheelofpasiva.domain.util.TimeProvider
 import kotlin.random.Random
 
 /**
+ * Result of creating a room, containing both room and player IDs.
+ */
+data class CreateRoomResult(
+    val roomId: String,
+    val playerId: String
+)
+
+/**
  * Use case for creating a new room.
  * Generates a unique 6-digit room ID and creates the room in the database.
  *
@@ -20,9 +28,9 @@ class CreateRoomUseCase(
      * Creates a new room with the given host nickname.
      *
      * @param hostNickname The nickname of the player creating the room
-     * @return Result containing the generated room ID or an error
+     * @return Result containing the room ID and player ID, or an error
      */
-    suspend operator fun invoke(hostNickname: String): Result<String> {
+    suspend operator fun invoke(hostNickname: String): Result<CreateRoomResult> {
         if (hostNickname.isBlank()) {
             return Result.failure(IllegalArgumentException("Nickname cannot be empty"))
         }
@@ -54,7 +62,7 @@ class CreateRoomUseCase(
                     players = listOf(player)
                 )
 
-                return repository.createRoom(room).map { roomId }
+                return repository.createRoom(room).map { CreateRoomResult(roomId, playerId) }
             }
         }
 

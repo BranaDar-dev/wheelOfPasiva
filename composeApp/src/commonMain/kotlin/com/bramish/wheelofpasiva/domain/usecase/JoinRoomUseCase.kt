@@ -20,9 +20,9 @@ class JoinRoomUseCase(
      *
      * @param roomId The 6-digit room ID to join
      * @param nickname The player's nickname
-     * @return Result indicating success or failure
+     * @return Result containing the player ID on success, or an error
      */
-    suspend operator fun invoke(roomId: String, nickname: String): Result<Unit> {
+    suspend operator fun invoke(roomId: String, nickname: String): Result<String> {
         // Validate room ID format (must be 6 digits)
         if (!roomId.matches(Regex("^\\d{6}$"))) {
             return Result.failure(RoomError.InvalidRoomId(roomId))
@@ -49,7 +49,7 @@ class JoinRoomUseCase(
             joinedAt = TimeProvider.now()
         )
 
-        return repository.addPlayer(roomId, player)
+        return repository.addPlayer(roomId, player).map { playerId }
     }
 
     /**

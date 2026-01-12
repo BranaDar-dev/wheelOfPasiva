@@ -7,6 +7,9 @@ import com.bramish.wheelofpasiva.domain.usecase.CreateRoomUseCase
 import com.bramish.wheelofpasiva.domain.usecase.GetRoomUseCase
 import com.bramish.wheelofpasiva.domain.usecase.JoinRoomUseCase
 import com.bramish.wheelofpasiva.domain.usecase.ObserveRoomUseCase
+import com.bramish.wheelofpasiva.domain.usecase.SetSecretWordUseCase
+import com.bramish.wheelofpasiva.domain.usecase.StartGameUseCase
+import com.bramish.wheelofpasiva.domain.usecase.UpdateGameStateUseCase
 import com.bramish.wheelofpasiva.presentation.game.GameViewModel
 import com.bramish.wheelofpasiva.presentation.home.HomeViewModel
 import com.bramish.wheelofpasiva.presentation.home.JoinRoomViewModel
@@ -45,6 +48,18 @@ class AppContainer {
         ObserveRoomUseCase(roomRepository)
     }
 
+    private val updateGameStateUseCase: UpdateGameStateUseCase by lazy {
+        UpdateGameStateUseCase(roomRepository)
+    }
+
+    private val startGameUseCase: StartGameUseCase by lazy {
+        StartGameUseCase(roomRepository)
+    }
+
+    private val setSecretWordUseCase: SetSecretWordUseCase by lazy {
+        SetSecretWordUseCase(roomRepository)
+    }
+
     // Presentation Layer - ViewModels
 
     /**
@@ -65,17 +80,25 @@ class AppContainer {
      * Provides a new instance of RoomViewModel for a specific room.
      *
      * @param roomId The unique room identifier
+     * @param playerId The current player's ID
      */
-    fun provideRoomViewModel(roomId: String): RoomViewModel {
-        return RoomViewModel(observeRoomUseCase, roomId)
+    fun provideRoomViewModel(roomId: String, playerId: String): RoomViewModel {
+        return RoomViewModel(observeRoomUseCase, startGameUseCase, roomId, playerId)
     }
 
     /**
      * Provides a new instance of GameViewModel for a specific room.
      *
      * @param roomId The unique room identifier
+     * @param playerId The current player's ID
      */
-    fun provideGameViewModel(roomId: String): GameViewModel {
-        return GameViewModel(observeRoomUseCase, roomId)
+    fun provideGameViewModel(roomId: String, playerId: String): GameViewModel {
+        return GameViewModel(
+            observeRoomUseCase,
+            updateGameStateUseCase,
+            setSecretWordUseCase,
+            roomId,
+            playerId
+        )
     }
 }

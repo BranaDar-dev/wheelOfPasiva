@@ -71,9 +71,9 @@ class JoinRoomViewModel(
             _uiState.value = JoinRoomUiState.Loading
 
             joinRoomUseCase(currentRoomId, currentNickname)
-                .onSuccess {
+                .onSuccess { playerId ->
                     _uiState.value = JoinRoomUiState.Success(currentRoomId)
-                    _navigationEvent.emit(NavigationEvent.NavigateToRoom(currentRoomId))
+                    _navigationEvent.emit(NavigationEvent.NavigateToRoom(currentRoomId, playerId))
                 }
                 .onFailure { error ->
                     val errorMessage = when (error) {
@@ -151,7 +151,7 @@ class JoinRoomViewModel(
      * Navigation events for the Join Room dialog.
      */
     sealed class NavigationEvent {
-        data class NavigateToRoom(val roomId: String) : NavigationEvent()
+        data class NavigateToRoom(val roomId: String, val playerId: String) : NavigationEvent()
         data object OpenQrScanner : NavigationEvent()
     }
 }

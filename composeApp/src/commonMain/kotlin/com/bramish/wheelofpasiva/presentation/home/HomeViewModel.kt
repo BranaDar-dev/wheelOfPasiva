@@ -49,9 +49,11 @@ class HomeViewModel(
             _uiState.value = HomeUiState.Loading
 
             createRoomUseCase(currentNickname)
-                .onSuccess { roomId ->
+                .onSuccess { result ->
                     _uiState.value = HomeUiState.Idle
-                    _navigationEvent.emit(NavigationEvent.NavigateToRoom(roomId))
+                    _navigationEvent.emit(
+                        NavigationEvent.NavigateToRoom(result.roomId, result.playerId)
+                    )
                 }
                 .onFailure { error ->
                     _uiState.value = HomeUiState.Error(
@@ -89,7 +91,7 @@ class HomeViewModel(
      * Navigation events for the Home screen.
      */
     sealed class NavigationEvent {
-        data class NavigateToRoom(val roomId: String) : NavigationEvent()
+        data class NavigateToRoom(val roomId: String, val playerId: String) : NavigationEvent()
         data object ShowJoinDialog : NavigationEvent()
     }
 }

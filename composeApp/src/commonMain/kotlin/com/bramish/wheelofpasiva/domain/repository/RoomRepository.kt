@@ -50,4 +50,49 @@ interface RoomRepository {
      * @return Result containing the room or error
      */
     suspend fun getRoom(roomId: String): Result<Room>
+
+    /**
+     * Updates the game state with wheel game fields.
+     *
+     * @param roomId The ID of the room to update
+     * @param isSpinning Whether the wheel is currently spinning
+     * @param nextTurnIndex The index of the next player's turn
+     * @param playerScores Map of player scores
+     * @param revealedLetters String of revealed letters
+     * @param lastSliceIndex Index of the last spin result
+     * @param hasExtraTurn Whether current player has extra turn
+     * @param isGameOver Whether the game is over
+     * @param winnerId ID of the winner
+     * @return Result indicating success or failure
+     */
+    suspend fun updateGameState(
+        roomId: String,
+        isSpinning: Boolean? = null,
+        nextTurnIndex: Int? = null,
+        playerScores: Map<String, Int>? = null,
+        revealedLetters: String? = null,
+        lastSliceIndex: Int? = null,
+        hasExtraTurn: Boolean? = null,
+        isGameOver: Boolean? = null,
+        winnerId: String? = null
+    ): Result<Unit>
+
+    /**
+     * Starts the game in a room.
+     * Sets isGameStarted to true so all players navigate to the game screen.
+     *
+     * @param roomId The ID of the room to start the game in
+     * @return Result indicating success or failure
+     */
+    suspend fun startGame(roomId: String): Result<Unit>
+
+    /**
+     * Sets the secret word/phrase for the game.
+     * Only the host should call this.
+     *
+     * @param roomId The ID of the room
+     * @param secretWord The secret word or phrase to guess
+     * @return Result indicating success or failure
+     */
+    suspend fun setSecretWord(roomId: String, secretWord: String): Result<Unit>
 }

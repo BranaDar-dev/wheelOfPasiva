@@ -11,8 +11,8 @@ import androidx.compose.runtime.setValue
  */
 sealed class Screen {
     data object Home : Screen()
-    data class Room(val roomId: String) : Screen()
-    data class Game(val roomId: String) : Screen()
+    data class Room(val roomId: String, val playerId: String) : Screen()
+    data class Game(val roomId: String, val playerId: String) : Screen()
 }
 
 /**
@@ -27,12 +27,12 @@ class SimpleNavigator {
         currentScreen = Screen.Home
     }
 
-    fun navigateToRoom(roomId: String) {
-        currentScreen = Screen.Room(roomId)
+    fun navigateToRoom(roomId: String, playerId: String) {
+        currentScreen = Screen.Room(roomId, playerId)
     }
 
-    fun navigateToGame(roomId: String) {
-        currentScreen = Screen.Game(roomId)
+    fun navigateToGame(roomId: String, playerId: String) {
+        currentScreen = Screen.Game(roomId, playerId)
     }
 
     fun navigateBack(): Boolean {
@@ -43,7 +43,7 @@ class SimpleNavigator {
                 true
             }
             is Screen.Game -> {
-                currentScreen = Screen.Room(screen.roomId)
+                currentScreen = Screen.Room(screen.roomId, screen.playerId)
                 true
             }
         }
