@@ -98,13 +98,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		425A586E12D0245A6A24C0FA /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		9C6A375A6A8587A51A9A9CAC /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,7 +112,6 @@
 				4EB321D1B545267317580202 /* Configuration */,
 				1BC7C6760881FF6AD62AA2DE /* iosApp */,
 				9C6A375A6A8587A51A9A9CAC /* Products */,
-				425A586E12D0245A6A24C0FA /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};

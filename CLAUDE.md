@@ -1,103 +1,87 @@
-# Wheel of Pasiva - Project Guidelines
+# CLAUDE.md
 
-This is a Kotlin Multiplatform project with Firebase integration.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Architecture Principles
+## Build Commands
 
-### MVVM (Model-View-ViewModel) Pattern
-- **ALWAYS** use MVVM architecture for UI components
-- **Model**: Data classes and business logic
-- **View**: UI layer (Compose/SwiftUI/Native views)
-- **ViewModel**: UI state management and business logic coordination
-- ViewModels should expose UI state through StateFlow or LiveData
-- Views should only observe state and dispatch user actions to ViewModels
-- No business logic in Views
+```bash
+# Sync after any gradle file changes (REQUIRED)
+./gradlew --refresh-dependencies
 
-### SOLID Principles
-Follow SOLID principles in all code:
-- **S**ingle Responsibility: Each class should have one reason to change
-- **O**pen/Closed: Open for extension, closed for modification
-- **L**iskov Substitution: Subtypes must be substitutable for their base types
-- **I**nterface Segregation: Many specific interfaces are better than one general interface
-- **D**ependency Inversion: Depend on abstractions, not concretions
+# Build Android APK
+./gradlew :composeApp:assembleDebug
 
-### Clean Architecture
-Organize code in layers with clear separation of concerns:
-- **Presentation Layer**: UI components, ViewModels, UI state
-- **Domain Layer**: Use cases, business logic, domain models
-- **Data Layer**: Repositories, data sources, API clients, database
+# Full build (all platforms)
+./gradlew :composeApp:build
 
-**Dependency Rule**: Dependencies should point inward (Presentation → Domain ← Data)
-- Domain layer should have NO dependencies on other layers
-- Use dependency injection for loose coupling
+# Run tests
+./gradlew :composeApp:test
 
-### Design Patterns
-Use appropriate design patterns when they solve real problems:
-- **Repository Pattern**: For data access abstraction
-- **Factory Pattern**: For object creation complexity
-- **Observer Pattern**: For reactive state management
-- **Strategy Pattern**: For interchangeable algorithms
-- **Dependency Injection**: For loose coupling and testability
-- Only use patterns when they add value, avoid over-engineering
+# Run a single test class
+./gradlew :composeApp:test --tests "com.bramish.wheelofpasiva.SomeTestClass"
 
-## Gradle Management
+# Clean build
+./gradlew clean :composeApp:build
+```
 
-### Critical Rule: Gradle Sync
-**ALWAYS sync the project with Gradle files after ANY changes to Gradle files**
+For iOS, open `iosApp/iosApp.xcodeproj` in Xcode and run from there.
 
-When you modify any of these files:
-- `build.gradle.kts`
+## Architecture
+
+This is a Kotlin Multiplatform project using **MVVM + Clean Architecture**. Code is shared between Android and iOS via Compose Multiplatform.
+
+### Layer Structure
+
+```
+composeApp/src/commonMain/kotlin/com/bramish/wheelofpasiva/
+├── presentation/     # ViewModels, UI state, Compose screens
+├── domain/          # Use cases, models, repository interfaces
+├── data/            # Repository implementations, DTOs, data sources
+├── di/              # Manual dependency injection (AppContainer)
+└── firebase/        # Firebase manager (expect/actual pattern)
+```
+
+**Dependency Rule**: Presentation → Domain ← Data (domain has no dependencies on other layers)
+
+### Platform-Specific Code
+
+Uses Kotlin's `expect/actual` pattern for platform implementations:
+- `commonMain/` - Shared code with `expect` declarations
+- `androidMain/` - Android `actual` implementations
+- `iosMain/` - iOS `actual` implementations
+
+Key platform-specific files:
+- `FirestoreDataSource` - Firebase Firestore operations
+- `FirebaseManager` - Analytics, crashlytics initialization
+- `QrCodeScanner` - Camera/barcode scanning
+
+### Dependency Injection
+
+Manual DI via `AppContainer` class - no external DI framework. ViewModels are provided via factory methods.
+
+### Navigation
+
+Custom state-based navigation in `presentation/navigation/SimpleNavigation.kt` (avoids navigation-compose iOS linkage issues).
+
+## Key Patterns
+
+- **MVVM**: ViewModels expose `StateFlow<UiState>`, views observe and dispatch actions
+- **Use Cases**: Single-purpose business operations with `operator fun invoke()`
+- **Repository Pattern**: Abstract interfaces in domain, implementations in data layer
+- **Sealed Classes**: For UI state (Loading/Success/Error) and navigation events
+
+## Gradle Sync Rule
+
+**ALWAYS run `./gradlew --refresh-dependencies` after modifying:**
+- Any `build.gradle.kts`
 - `settings.gradle.kts`
 - `gradle.properties`
-- `libs.versions.toml`
-- Any module-level `build.gradle.kts`
+- `gradle/libs.versions.toml`
 
-**You MUST run:**
-```bash
-./gradlew --refresh-dependencies
-```
+## Code Standards
 
-Or if the user has a specific sync command, use that.
-
-## Code Quality Standards
-
-### Kotlin Best Practices
-- Use immutable data structures (`val` over `var`)
-- Leverage Kotlin's null safety features
-- Use coroutines for asynchronous operations
-- Prefer extension functions for utility methods
+- Use `val` over `var` (immutability)
+- Use coroutines/Flow for async operations
+- Keep Firebase code in Data layer only
+- Domain layer must remain platform-agnostic
 - Use sealed classes for state representation
-
-### Testing
-- Write unit tests for ViewModels and use cases
-- Use test doubles (mocks, fakes) for dependencies
-- Maintain test coverage for business logic
-
-### Firebase Integration
-- Keep Firebase-specific code in the Data layer
-- Use repository pattern to abstract Firebase operations
-- Handle Firebase exceptions appropriately
-- Consider offline capabilities
-
-## Project Structure Example
-
-```
-commonMain/
-├── data/
-│   ├── repository/
-│   ├── datasource/
-│   └── model/
-├── domain/
-│   ├── usecase/
-│   ├── model/
-│   └── repository/
-└── presentation/
-    ├── viewmodel/
-    ├── state/
-    └── ui/
-```
-
-## Notes
-- This is a Kotlin Multiplatform project - ensure code works across platforms
-- Follow platform-specific guidelines when necessary for iOS/Android
-- Keep shared code truly platform-agnostic
