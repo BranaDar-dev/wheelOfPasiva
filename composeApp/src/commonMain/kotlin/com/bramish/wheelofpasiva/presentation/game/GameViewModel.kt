@@ -8,6 +8,8 @@ import com.bramish.wheelofpasiva.domain.model.WheelSlice
 import com.bramish.wheelofpasiva.domain.usecase.ObserveRoomUseCase
 import com.bramish.wheelofpasiva.domain.usecase.SetSecretWordUseCase
 import com.bramish.wheelofpasiva.domain.usecase.UpdateGameStateUseCase
+import com.bramish.wheelofpasiva.platform.GameSound
+import com.bramish.wheelofpasiva.platform.SoundPlayer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +26,7 @@ class GameViewModel(
     private val observeRoomUseCase: ObserveRoomUseCase,
     private val updateGameStateUseCase: UpdateGameStateUseCase,
     private val setSecretWordUseCase: SetSecretWordUseCase,
+    private val soundPlayer: SoundPlayer,
     private val roomId: String,
     private val playerId: String
 ) : ViewModel() {
@@ -157,6 +160,9 @@ class GameViewModel(
         }
 
         viewModelScope.launch {
+            // Start spinning sound
+            soundPlayer.playLoop(GameSound.WHEEL_SPIN)
+
             // Start spinning
             updateGameStateUseCase(
                 roomId = roomId,
@@ -168,6 +174,9 @@ class GameViewModel(
             // Simulate spinning animation delay
             delay(2000)
 
+            // Stop spinning sound
+            soundPlayer.stop(GameSound.WHEEL_SPIN)
+
             // Get random slice index (0-7)
             val sliceIndex = Random.nextInt(8)
             val slice = WheelSlice.getSliceAtIndex(sliceIndex)
@@ -175,6 +184,9 @@ class GameViewModel(
             // Handle the spin result
             when (slice) {
                 is WheelSlice.Bankrupt -> {
+                    // Play bankrupt sound
+                    soundPlayer.play(GameSound.BANKRUPT)
+
                     // Clear player's score and end turn
                     val newScores = state.playerScores.toMutableMap()
                     newScores[playerId] = 0
@@ -190,6 +202,9 @@ class GameViewModel(
                     )
                 }
                 is WheelSlice.ExtraTurn -> {
+                    // Play extra turn sound
+                    soundPlayer.play(GameSound.EXTRA_TURN)
+
                     // Player gets another spin
                     updateGameStateUseCase(
                         roomId = roomId,
@@ -235,6 +250,13 @@ class GameViewModel(
             val letterInWord = secretWord.contains(guessedLetter)
             val newRevealedLetters = state.revealedLetters + guessedLetter
             val newRevealedString = newRevealedLetters.joinToString("")
+
+            // Play sound based on result
+            if (letterInWord) {
+                soundPlayer.play(GameSound.CORRECT_ANSWER)
+            } else {
+                soundPlayer.play(GameSound.INCORRECT_ANSWER)
+            }
 
             // After guessing one letter, turn always moves to next player
             val nextTurn = (state.currentTurnIndex + 1) % state.players.size
@@ -364,4 +386,12 @@ class GameViewModel(
     }
 
     fun getRoomId(): String = roomId
+
+    /**
+     * Clean up resources when ViewModel is cleared.
+     */
+    override fun onCleared() {
+        super.onCleared()
+        soundPlayer.release()
+    }
 }

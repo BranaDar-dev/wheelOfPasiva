@@ -10,6 +10,7 @@ import com.bramish.wheelofpasiva.domain.usecase.ObserveRoomUseCase
 import com.bramish.wheelofpasiva.domain.usecase.SetSecretWordUseCase
 import com.bramish.wheelofpasiva.domain.usecase.StartGameUseCase
 import com.bramish.wheelofpasiva.domain.usecase.UpdateGameStateUseCase
+import com.bramish.wheelofpasiva.platform.SoundPlayer
 import com.bramish.wheelofpasiva.presentation.game.GameViewModel
 import com.bramish.wheelofpasiva.presentation.home.HomeViewModel
 import com.bramish.wheelofpasiva.presentation.home.JoinRoomViewModel
@@ -97,6 +98,7 @@ class AppContainer {
             observeRoomUseCase,
             updateGameStateUseCase,
             setSecretWordUseCase,
+            SoundPlayer(),
             roomId,
             playerId
         )
