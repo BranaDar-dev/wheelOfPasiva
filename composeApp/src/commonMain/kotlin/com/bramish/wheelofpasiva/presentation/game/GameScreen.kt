@@ -248,6 +248,24 @@ private fun GameContent(
 
         // Letter keyboard - always visible to show progress
         if (!state.secretWord.isNullOrBlank() && !state.isGameOver) {
+            // Show message if letters are disabled (haven't spun yet)
+            if (state.isMyTurn && !state.showGuessInput && !state.isSpinning) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = 2.dp,
+                    backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.5f)
+                ) {
+                    Text(
+                        text = "Spin the wheel first to select a letter",
+                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             LetterKeyboard(
                 revealedLetters = state.revealedLetters,
                 secretWord = state.secretWord,
@@ -718,13 +736,14 @@ private fun LetterButton(
     val backgroundColor = when {
         isGuessed && isInWord -> Color(0xFF4CAF50) // Green - correct
         isGuessed && !isInWord -> Color(0xFFE0E0E0) // Gray - wrong
+        !enabled -> MaterialTheme.colors.surface.copy(alpha = 0.3f) // Dimmed when disabled
         else -> MaterialTheme.colors.surface
     }
     val textColor = when {
         isGuessed && isInWord -> Color.White
         isGuessed && !isInWord -> Color.Gray
         enabled -> MaterialTheme.colors.onSurface
-        else -> MaterialTheme.colors.onSurface.copy(alpha = 0.4f)
+        else -> MaterialTheme.colors.onSurface.copy(alpha = 0.3f) // More dimmed when disabled
     }
 
     Surface(
@@ -732,7 +751,7 @@ private fun LetterButton(
             .size(32.dp),
         shape = RoundedCornerShape(4.dp),
         color = backgroundColor,
-        elevation = if (isGuessed) 0.dp else 2.dp
+        elevation = if (isGuessed) 0.dp else if (enabled) 2.dp else 0.dp
     ) {
         Button(
             onClick = onClick,
