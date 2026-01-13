@@ -13,6 +13,7 @@ import kotlinx.datetime.Instant
  * @property currentTurnIndex Index of the player whose turn it is (0-based, into players list)
  * @property isSpinning Whether the wheel is currently spinning
  * @property secretWord The secret word/phrase set by the host (only visible to host)
+ * @property language The language of the secret word (English or Hebrew)
  * @property playerScores Map of player ID to their accumulated score
  * @property revealedLetters String of letters that have been correctly guessed
  * @property lastSliceIndex Index of the slice from the last spin (0-7)
@@ -29,6 +30,7 @@ data class Room(
     val currentTurnIndex: Int = 0,
     val isSpinning: Boolean = false,
     val secretWord: String? = null,
+    val language: Language = Language.ENGLISH,
     val playerScores: Map<String, Int> = emptyMap(),
     val revealedLetters: String = "",
     val lastSliceIndex: Int? = null,

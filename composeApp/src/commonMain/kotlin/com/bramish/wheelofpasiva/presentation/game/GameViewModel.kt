@@ -110,6 +110,7 @@ class GameViewModel(
                                 isMyTurn = isMyTurn,
                                 isHost = isHost,
                                 secretWord = room.secretWord,
+                                language = room.language,
                                 revealedLetters = revealedLetters,
                                 playerScores = room.playerScores,
                                 myScore = room.playerScores[playerId] ?: 0,
@@ -333,14 +334,14 @@ class GameViewModel(
      * Sets the secret word/phrase for the game.
      * Only the host can set the secret word.
      */
-    fun setSecretWord(word: String) {
+    fun setSecretWord(word: String, language: com.bramish.wheelofpasiva.domain.model.Language) {
         val state = _uiState.value
         if (state !is GameUiState.Playing || !state.isHost) {
             return
         }
 
         viewModelScope.launch {
-            setSecretWordUseCase(roomId, word.uppercase())
+            setSecretWordUseCase(roomId, word.uppercase(), language)
         }
     }
 

@@ -73,7 +73,7 @@ class RoomRepositoryImpl(
         return dataSource.startGame(roomId)
     }
 
-    override suspend fun setSecretWord(roomId: String, secretWord: String): Result<Unit> {
-        return dataSource.setSecretWord(roomId, secretWord)
+    override suspend fun setSecretWord(roomId: String, secretWord: String, language: com.bramish.wheelofpasiva.domain.model.Language): Result<Unit> {
+        return dataSource.setSecretWord(roomId, secretWord, language.name)
     }
 }

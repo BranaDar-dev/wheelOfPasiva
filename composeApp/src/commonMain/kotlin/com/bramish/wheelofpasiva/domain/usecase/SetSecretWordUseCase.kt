@@ -14,9 +14,10 @@ class SetSecretWordUseCase(
      *
      * @param roomId The room to set the word for
      * @param secretWord The secret word or phrase to guess
+     * @param language The language of the secret word
      * @return Result indicating success or failure
      */
-    suspend operator fun invoke(roomId: String, secretWord: String): Result<Unit> {
-        return roomRepository.setSecretWord(roomId, secretWord)
+    suspend operator fun invoke(roomId: String, secretWord: String, language: com.bramish.wheelofpasiva.domain.model.Language): Result<Unit> {
+        return roomRepository.setSecretWord(roomId, secretWord, language)
     }
 }

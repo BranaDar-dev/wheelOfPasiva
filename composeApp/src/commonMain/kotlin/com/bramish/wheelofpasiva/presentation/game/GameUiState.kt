@@ -41,6 +41,7 @@ sealed class GameUiState {
         val isMyTurn: Boolean = false,
         val isHost: Boolean = false,
         val secretWord: String? = null,
+        val language: com.bramish.wheelofpasiva.domain.model.Language = com.bramish.wheelofpasiva.domain.model.Language.ENGLISH,
         val revealedLetters: Set<Char> = emptySet(),
         val playerScores: Map<String, Int> = emptyMap(),
         val myScore: Int = 0,

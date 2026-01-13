@@ -92,7 +92,8 @@ interface RoomRepository {
      *
      * @param roomId The ID of the room
      * @param secretWord The secret word or phrase to guess
+     * @param language The language of the secret word
      * @return Result indicating success or failure
      */
-    suspend fun setSecretWord(roomId: String, secretWord: String): Result<Unit>
+    suspend fun setSecretWord(roomId: String, secretWord: String, language: com.bramish.wheelofpasiva.domain.model.Language): Result<Unit>
 }

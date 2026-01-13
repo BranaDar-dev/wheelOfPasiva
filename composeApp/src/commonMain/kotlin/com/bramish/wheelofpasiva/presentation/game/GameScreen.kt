@@ -94,7 +94,7 @@ fun GameScreen(
                     GameContent(
                         state = state,
                         onSpin = { viewModel.spinWheel() },
-                        onSetSecretWord = { word -> viewModel.setSecretWord(word) },
+                        onSetSecretWord = { word, language -> viewModel.setSecretWord(word, language) },
                         onDismissSecretWordDialog = { viewModel.dismissSecretWordDialog() },
                         onGuessLetter = { letter -> viewModel.guessLetter(letter) },
                         onGuessWord = { word -> viewModel.guessWord(word) }
@@ -132,7 +132,7 @@ fun GameScreen(
 private fun GameContent(
     state: GameUiState.Playing,
     onSpin: () -> Unit,
-    onSetSecretWord: (String) -> Unit,
+    onSetSecretWord: (String, com.bramish.wheelofpasiva.domain.model.Language) -> Unit,
     onDismissSecretWordDialog: () -> Unit,
     onGuessLetter: (Char) -> Unit,
     onGuessWord: (String) -> Unit
@@ -270,6 +270,7 @@ private fun GameContent(
                 revealedLetters = state.revealedLetters,
                 secretWord = state.secretWord,
                 enabled = state.showGuessInput,
+                language = state.language,
                 onLetterClick = onGuessLetter
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -686,21 +687,37 @@ private fun LetterKeyboard(
     revealedLetters: Set<Char>,
     secretWord: String,
     enabled: Boolean,
+    language: com.bramish.wheelofpasiva.domain.model.Language,
     onLetterClick: (Char) -> Unit
 ) {
-    val alphabet = ('A'..'Z').toList()
+    val alphabet = language.getAlphabet()
     val secretWordUpper = secretWord.uppercase()
 
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Split alphabet into 3 rows
-        val row1 = alphabet.take(9)      // A-I
-        val row2 = alphabet.drop(9).take(9) // J-R
-        val row3 = alphabet.drop(18)     // S-Z
+        // Split alphabet into rows based on language
+        val rows = when (language) {
+            com.bramish.wheelofpasiva.domain.model.Language.ENGLISH -> {
+                // Split into 3 rows
+                listOf(
+                    alphabet.take(9),      // A-I
+                    alphabet.drop(9).take(9), // J-R
+                    alphabet.drop(18)      // S-Z
+                )
+            }
+            com.bramish.wheelofpasiva.domain.model.Language.HEBREW -> {
+                // Split Hebrew alphabet (22 letters) into 3 rows
+                listOf(
+                    alphabet.take(8),      // First 8 letters
+                    alphabet.drop(8).take(7),  // Next 7 letters
+                    alphabet.drop(15)      // Last 7 letters
+                )
+            }
+        }
 
-        listOf(row1, row2, row3).forEach { row ->
+        rows.forEach { row ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.padding(vertical = 2.dp)
@@ -848,10 +865,11 @@ private fun WordGuessArea(onGuessWord: (String) -> Unit) {
  */
 @Composable
 private fun SecretWordDialog(
-    onConfirm: (String) -> Unit,
+    onConfirm: (String, com.bramish.wheelofpasiva.domain.model.Language) -> Unit,
     onDismiss: () -> Unit
 ) {
     var text by remember { mutableStateOf("") }
+    var selectedLanguage by remember { mutableStateOf(com.bramish.wheelofpasiva.domain.model.Language.ENGLISH) }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -879,6 +897,71 @@ private fun SecretWordDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Language Toggle
+                Card(
+                    elevation = 2.dp,
+                    backgroundColor = MaterialTheme.colors.surface,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Language:",
+                            style = MaterialTheme.typography.body2,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        // English Button
+                        Button(
+                            onClick = { selectedLanguage = com.bramish.wheelofpasiva.domain.model.Language.ENGLISH },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = if (selectedLanguage == com.bramish.wheelofpasiva.domain.model.Language.ENGLISH) {
+                                    MaterialTheme.colors.primary
+                                } else {
+                                    MaterialTheme.colors.surface
+                                }
+                            ),
+                            modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                        ) {
+                            Text(
+                                text = "English",
+                                color = if (selectedLanguage == com.bramish.wheelofpasiva.domain.model.Language.ENGLISH) {
+                                    Color.White
+                                } else {
+                                    MaterialTheme.colors.onSurface
+                                }
+                            )
+                        }
+
+                        // Hebrew Button
+                        Button(
+                            onClick = { selectedLanguage = com.bramish.wheelofpasiva.domain.model.Language.HEBREW },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = if (selectedLanguage == com.bramish.wheelofpasiva.domain.model.Language.HEBREW) {
+                                    MaterialTheme.colors.primary
+                                } else {
+                                    MaterialTheme.colors.surface
+                                }
+                            ),
+                            modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                        ) {
+                            Text(
+                                text = "עברית",
+                                color = if (selectedLanguage == com.bramish.wheelofpasiva.domain.model.Language.HEBREW) {
+                                    Color.White
+                                } else {
+                                    MaterialTheme.colors.onSurface
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 OutlinedTextField(
                     value = text,
                     onValueChange = { text = it },
@@ -901,7 +984,7 @@ private fun SecretWordDialog(
                     }
 
                     Button(
-                        onClick = { if (text.isNotBlank()) onConfirm(text) },
+                        onClick = { if (text.isNotBlank()) onConfirm(text, selectedLanguage) },
                         enabled = text.isNotBlank(),
                         modifier = Modifier.weight(1f)
                     ) {

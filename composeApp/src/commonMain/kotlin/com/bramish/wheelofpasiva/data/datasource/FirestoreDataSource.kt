@@ -165,7 +165,7 @@ class FirestoreDataSource {
     /**
      * Sets the secret word/phrase for the game.
      */
-    suspend fun setSecretWord(roomId: String, secretWord: String): Result<Unit> {
+    suspend fun setSecretWord(roomId: String, secretWord: String, language: String): Result<Unit> {
         return try {
             val documentRef = roomsCollection.document(roomId)
             val snapshot = documentRef.get()
@@ -175,7 +175,7 @@ class FirestoreDataSource {
             }
 
             val roomData = snapshot.data<RoomDto>()
-            val updatedRoom = roomData.copy(secretWord = secretWord)
+            val updatedRoom = roomData.copy(secretWord = secretWord, language = language)
 
             documentRef.set(updatedRoom)
             Result.success(Unit)
