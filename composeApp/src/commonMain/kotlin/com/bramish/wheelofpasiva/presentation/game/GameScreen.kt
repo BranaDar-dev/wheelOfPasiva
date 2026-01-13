@@ -95,7 +95,6 @@ fun GameScreen(
                         state = state,
                         onSpin = { viewModel.spinWheel() },
                         onSetSecretWord = { word, language -> viewModel.setSecretWord(word, language) },
-                        onDismissSecretWordDialog = { viewModel.dismissSecretWordDialog() },
                         onGuessLetter = { letter -> viewModel.guessLetter(letter) },
                         onGuessWord = { word -> viewModel.guessWord(word) }
                     )
@@ -133,7 +132,6 @@ private fun GameContent(
     state: GameUiState.Playing,
     onSpin: () -> Unit,
     onSetSecretWord: (String, com.bramish.wheelofpasiva.domain.model.Language) -> Unit,
-    onDismissSecretWordDialog: () -> Unit,
     onGuessLetter: (Char) -> Unit,
     onGuessWord: (String) -> Unit
 ) {
@@ -177,8 +175,7 @@ private fun GameContent(
     // Secret word dialog for host
     if (state.showSecretWordDialog) {
         SecretWordDialog(
-            onConfirm = onSetSecretWord,
-            onDismiss = onDismissSecretWordDialog
+            onConfirm = onSetSecretWord
         )
     }
 
@@ -865,13 +862,12 @@ private fun WordGuessArea(onGuessWord: (String) -> Unit) {
  */
 @Composable
 private fun SecretWordDialog(
-    onConfirm: (String, com.bramish.wheelofpasiva.domain.model.Language) -> Unit,
-    onDismiss: () -> Unit
+    onConfirm: (String, com.bramish.wheelofpasiva.domain.model.Language) -> Unit
 ) {
     var text by remember { mutableStateOf("") }
     var selectedLanguage by remember { mutableStateOf(com.bramish.wheelofpasiva.domain.model.Language.ENGLISH) }
 
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = {}) {
         Card(
             shape = RoundedCornerShape(16.dp),
             elevation = 8.dp
@@ -972,24 +968,12 @@ private fun SecretWordDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                Button(
+                    onClick = { if (text.isNotBlank()) onConfirm(text, selectedLanguage) },
+                    enabled = text.isNotBlank(),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Skip")
-                    }
-
-                    Button(
-                        onClick = { if (text.isNotBlank()) onConfirm(text, selectedLanguage) },
-                        enabled = text.isNotBlank(),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Confirm")
-                    }
+                    Text("Confirm")
                 }
             }
         }
