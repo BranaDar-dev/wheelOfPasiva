@@ -927,7 +927,7 @@ private fun SecretWordDialog(
                             modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
                         ) {
                             Text(
-                                text = "English",
+                                text = "En",
                                 color = if (selectedLanguage == com.bramish.wheelofpasiva.domain.model.Language.ENGLISH) {
                                     Color.White
                                 } else {
@@ -949,7 +949,7 @@ private fun SecretWordDialog(
                             modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
                         ) {
                             Text(
-                                text = "עברית",
+                                text = "Heb",
                                 color = if (selectedLanguage == com.bramish.wheelofpasiva.domain.model.Language.HEBREW) {
                                     Color.White
                                 } else {
