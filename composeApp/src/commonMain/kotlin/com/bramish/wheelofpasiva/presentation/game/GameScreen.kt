@@ -19,10 +19,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -197,7 +199,8 @@ private fun GameContent(
         if (!state.secretWord.isNullOrBlank()) {
             WordDisplay(
                 displayWord = state.getDisplayWord(),
-                isHost = state.isHost
+                isHost = state.isHost,
+                language = state.language
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -515,7 +518,8 @@ private fun BoxScope.SliceLabel(
 @Composable
 private fun WordDisplay(
     displayWord: String,
-    isHost: Boolean
+    isHost: Boolean,
+    language: com.bramish.wheelofpasiva.domain.model.Language
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -534,17 +538,25 @@ private fun WordDisplay(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = displayWord,
-                style = MaterialTheme.typography.h5,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 2.sp,
-                color = if (isHost) {
-                    MaterialTheme.colors.primary
+            CompositionLocalProvider(
+                LocalLayoutDirection provides if (language == com.bramish.wheelofpasiva.domain.model.Language.HEBREW) {
+                    LayoutDirection.Rtl
                 } else {
-                    MaterialTheme.colors.onSurface
+                    LayoutDirection.Ltr
                 }
-            )
+            ) {
+                Text(
+                    text = displayWord,
+                    style = MaterialTheme.typography.h5,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 2.sp,
+                    color = if (isHost) {
+                        MaterialTheme.colors.primary
+                    } else {
+                        MaterialTheme.colors.onSurface
+                    }
+                )
+            }
         }
     }
 }

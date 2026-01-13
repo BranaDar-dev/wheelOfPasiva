@@ -258,7 +258,7 @@ class GameViewModel(
                 soundPlayer.play(GameSound.INCORRECT_ANSWER)
             }
 
-            // After guessing one letter, turn always moves to next player
+            // Next turn only if wrong answer
             val nextTurn = (state.currentTurnIndex + 1) % state.players.size
 
             if (letterInWord) {
@@ -283,13 +283,12 @@ class GameViewModel(
                         winnerId = playerId
                     )
                 } else {
-                    // Correct letter - add points and move to next turn
+                    // Correct letter - add points, keep turn, must spin again
                     updateGameStateUseCase(
                         roomId = roomId,
                         revealedLetters = newRevealedString,
                         playerScores = newScores,
-                        nextTurnIndex = nextTurn,
-                        lastSliceIndex = null
+                        lastSliceIndex = null // Reset to require spinning again
                     )
                 }
             } else {
